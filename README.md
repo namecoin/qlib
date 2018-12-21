@@ -1,3 +1,9 @@
+# qlib
+
+This is a library for performing DNS queries.  Its API is similar to the command-line tool `q` by Miek Gieben (and in fact `qlib` is a fork of `q`), but its API is exposed as a Go library instead of a command-line tool.
+
+# Original miekg/exdns README
+
 [![Build Status](https://travis-ci.org/miekg/exdns.svg?branch=master)](https://travis-ci.org/miekg/exdns)
 [![BSD 2-clause license](https://img.shields.io/github/license/miekg/exdns.svg?maxAge=2592000)](https://opensource.org/licenses/BSD-2-Clause)
 
