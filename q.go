@@ -400,7 +400,10 @@ func (p *Params) Do(args []string) (*Result, error) {
 		switch err {
 		case nil:
 			//do nothing
-		case dns.ErrTruncated:
+		default:
+			return nil, fmt.Errorf(";; %s\n", err.Error())
+		}
+		if(r.Truncated) {
 			if p.Fallback {
 				if !p.Dnssec {
 					result.FallbackBufSize = true
@@ -422,8 +425,6 @@ func (p *Params) Do(args []string) (*Result, error) {
 				}
 			}
 			return nil, fmt.Errorf(";; Truncated\n")
-		default:
-			return nil, fmt.Errorf(";; %s\n", err.Error())
 		}
 		if r.Id != m.Id {
 			return nil, fmt.Errorf("Id mismatch\n")
