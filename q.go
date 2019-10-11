@@ -28,26 +28,29 @@ import (
 // TODO(miek): serial in ixfr
 
 type Params struct {
-	Dnskey   *dns.DNSKEY
-	Short    bool
-	Dnssec   bool
-	Query    bool
-	Check    bool
-	Six      bool
-	Four     bool
-	Anchor   string
-	Tsig     string
-	Port     int
-	Aa       bool
-	Ad       bool
-	Cd       bool
-	Rd       bool
-	Fallback bool
-	Tcp      bool
-	Nsid     bool
-	Client   string
-	Opcode   string
-	Rcode    string
+	Dnskey       *dns.DNSKEY
+	Short        bool
+	Dnssec       bool
+	Query        bool
+	Check        bool
+	Six          bool
+	Four         bool
+	Anchor       string
+	Tsig         string
+	Port         int
+	Aa           bool
+	Ad           bool
+	Cd           bool
+	Rd           bool
+	Fallback     bool
+	Tcp          bool
+	TimeoutDial  time.Duration
+	TimeoutRead  time.Duration
+	TimeoutWrite time.Duration
+	Nsid         bool
+	Client       string
+	Opcode       string
+	Rcode        string
 }
 
 func DefaultParams() *Params {
@@ -68,6 +71,9 @@ func DefaultParams() *Params {
 		Rd: true,
 		Fallback: false,
 		Tcp: false,
+		TimeoutDial: 2*time.Second,
+		TimeoutRead: 2*time.Second,
+		TimeoutWrite: 2*time.Second,
 		Nsid: false,
 		Client: "",
 		Opcode: "query",
@@ -225,6 +231,9 @@ func (p *Params) Do(args []string) (*Result, error) {
 			c.Net = "tcp6"
 		}
 	}
+	c.DialTimeout = p.TimeoutDial
+	c.ReadTimeout = p.TimeoutRead
+	c.WriteTimeout = p.TimeoutWrite
 
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
@@ -290,7 +299,7 @@ func (p *Params) Do(args []string) (*Result, error) {
 			tcp = "tcp6"
 		}
 		var err error
-		if co.Conn, err = net.DialTimeout(tcp, nameserver, 2*time.Second); err != nil {
+		if co.Conn, err = net.DialTimeout(tcp, nameserver, p.TimeoutDial); err != nil {
 			return nil, fmt.Errorf("Dialing "+nameserver+" failed: "+err.Error()+"\n")
 		}
 		defer co.Close()
@@ -314,8 +323,8 @@ func (p *Params) Do(args []string) (*Result, error) {
 					return nil, fmt.Errorf(";; TSIG key data error\n")
 				}
 			}
-			co.SetReadDeadline(time.Now().Add(2 * time.Second))
-			co.SetWriteDeadline(time.Now().Add(2 * time.Second))
+			co.SetReadDeadline(time.Now().Add(p.TimeoutRead))
+			co.SetWriteDeadline(time.Now().Add(p.TimeoutWrite))
 
 			if p.Query {
 				result.QueryMsg = m
