@@ -38,6 +38,7 @@ type Params struct {
 	Anchor       string
 	Tsig         string
 	Port         int
+	LAddr        string
 	Aa           bool
 	Ad           bool
 	Cd           bool
@@ -65,6 +66,7 @@ func DefaultParams() *Params {
 		Anchor: "",
 		Tsig: "",
 		Port: 53,
+		LAddr: "",
 		Aa: false,
 		Ad: false,
 		Cd: false,
@@ -235,6 +237,16 @@ func (p *Params) Do(args []string) (*Result, error) {
 	c.ReadTimeout = p.TimeoutRead
 	c.WriteTimeout = p.TimeoutWrite
 
+	if p.LAddr != "" {
+		c.Dialer = &net.Dialer{Timeout: c.DialTimeout}
+		ip := net.ParseIP(p.LAddr)
+		if p.Tcp {
+			c.Dialer.LocalAddr = &net.TCPAddr{IP: ip}
+		} else {
+			c.Dialer.LocalAddr = &net.UDPAddr{IP: ip}
+		}
+	}
+
 	m := &dns.Msg{
 		MsgHdr: dns.MsgHdr{
 			Authoritative:     p.Aa,
@@ -299,9 +311,17 @@ func (p *Params) Do(args []string) (*Result, error) {
 			tcp = "tcp6"
 		}
 		var err error
-		if co.Conn, err = net.DialTimeout(tcp, nameserver, p.TimeoutDial); err != nil {
+
+		if c.Dialer != nil {
+			co.Conn, err = c.Dialer.Dial(tcp, nameserver)
+		} else {
+			co.Conn, err = net.DialTimeout(tcp, nameserver, p.TimeoutDial)
+		}
+
+		if err != nil {
 			return nil, fmt.Errorf("Dialing "+nameserver+" failed: "+err.Error()+"\n")
 		}
+
 		defer co.Close()
 		qt := dns.TypeA
 		qc := uint16(dns.ClassINET)

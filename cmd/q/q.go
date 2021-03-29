@@ -19,6 +19,7 @@ var (
 	anchor       = flag.String("anchor", "", "use the DNSKEY in this file as trust anchor")
 	tsig         = flag.String("tsig", "", "request tsig with key: [hmac:]name:key")
 	port         = flag.Int("port", 53, "port number to use")
+	laddr        = flag.String("laddr", "", "local address to use")
 	aa           = flag.Bool("aa", false, "set AA flag in query")
 	ad           = flag.Bool("ad", false, "set AD flag in query")
 	cd           = flag.Bool("cd", false, "set CD flag in query")
@@ -52,6 +53,7 @@ func main() {
 		Anchor: *anchor,
 		Tsig: *tsig,
 		Port: *port,
+		LAddr: *laddr,
 		Aa: *aa,
 		Ad: *ad,
 		Cd: *cd,
