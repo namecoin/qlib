@@ -38,7 +38,7 @@ type Params struct {
 	Anchor       string
 	Tsig         string
 	Port         int
-	LAddr        string
+	Laddr        string
 	Aa           bool
 	Ad           bool
 	Cd           bool
@@ -66,7 +66,7 @@ func DefaultParams() *Params {
 		Anchor: "",
 		Tsig: "",
 		Port: 53,
-		LAddr: "",
+		Laddr: "",
 		Aa: false,
 		Ad: false,
 		Cd: false,
@@ -237,9 +237,9 @@ func (p *Params) Do(args []string) (*Result, error) {
 	c.ReadTimeout = p.TimeoutRead
 	c.WriteTimeout = p.TimeoutWrite
 
-	if p.LAddr != "" {
+	if p.Laddr != "" {
 		c.Dialer = &net.Dialer{Timeout: c.DialTimeout}
-		ip := net.ParseIP(p.LAddr)
+		ip := net.ParseIP(p.Laddr)
 		if p.Tcp {
 			c.Dialer.LocalAddr = &net.TCPAddr{IP: ip}
 		} else {

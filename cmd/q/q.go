@@ -53,7 +53,7 @@ func main() {
 		Anchor: *anchor,
 		Tsig: *tsig,
 		Port: *port,
-		LAddr: *laddr,
+		Laddr: *laddr,
 		Aa: *aa,
 		Ad: *ad,
 		Cd: *cd,
