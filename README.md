@@ -1,6 +1,6 @@
 # qlib
 
-This is a library for performing DNS queries.  Its API is similar to the command-line tool `q` by Miek Gieben (and in fact `qlib` is a fork of `q`), but its API is exposed as a Go library instead of a command-line tool.
+This is a library for performing DNS queries.  Its API is similar to [the command-line tool `q` by Miek Gieben](https://github.com/miekg/exdns/tree/master/q) (and in fact `qlib` is a fork of `q`), but its API is exposed as a Go library instead of a command-line tool.
 
 # Original miekg/exdns README
 
