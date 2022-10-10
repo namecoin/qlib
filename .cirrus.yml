@@ -9,16 +9,18 @@ task:
     image: golang:$GO_VERSION
     cpu: 8
     memory: 8G
-  install_script:
-    - go get github.com/mitchellh/gox
   path_script:
     - source testdata/move_to_gopath.bash
   matrix:
     - env:
         GO111MODULE: "off"
+      gox_script:
+        - go get github.com/mitchellh/gox
       fetch_script:
         - go get -tags "$GOX_TAGS" -d -v -t github.com/$CIRRUS_REPO_FULL_NAME/...
-    - fetch_script:
+    - gox_script:
+        - go install github.com/mitchellh/gox@latest
+      fetch_script:
         - cd $(go env GOPATH)/src/github.com/"$CIRRUS_REPO_FULL_NAME"
         - go mod init
         - go mod tidy
